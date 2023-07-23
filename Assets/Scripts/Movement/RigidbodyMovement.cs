@@ -19,7 +19,6 @@ public class RigidbodyMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
-
     private void Update()
     {
         //Get the input values from the player
@@ -30,7 +29,7 @@ public class RigidbodyMovement : MonoBehaviour
     private void FixedUpdate()
     {
         //Change the velocity of our player
-        //rb.velocity = new Vector3(xMove, rb.velocity.y, zMove);
+        rb.velocity = new Vector3(xMove, rb.velocity.y, zMove);
         Vector3 movement = (transform.forward * zMove) + (transform.right * xMove);
         rb.velocity = movement;
     }

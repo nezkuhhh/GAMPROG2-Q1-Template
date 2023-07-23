@@ -10,23 +10,24 @@ public class ItemData
     public ItemType type;
     public EquipmentSlotType slotType;
     public List<Attribute> attributes;
+    public GameObject prefab;
 }
 
 public enum ItemType
 {
     Consumable,
     Equipabble, 
+    Key,
 }
 
 public enum EquipmentSlotType
 {
-    // Define other equipment slots here
     None,
-    Head,
-    Body,
+    Weapon,
+    Item,
+    Shield,
     Boots,
-    MainWeapon,
-    SecondaryWeapon
+    Helmet,
 }
 
 [System.Serializable]
@@ -44,12 +45,9 @@ public class Attribute
 
 public enum AttributeType
 {
-    // Add other attribute types here
     HP,
+    Strength,
+    Agility,
+    Defense,
     MP,
-    STR,
-    DEF,
-    INT,
-    AGI,
-    VIT,
 }

@@ -10,19 +10,35 @@ public class InventorySlot : MonoBehaviour
 
     public void SetItem(ItemData data)
     {
+        // TODO
         // Set the item data the and icons here
-        itemData = data;
         itemIcon.enabled = true;
-        itemIcon.sprite = itemData.icon;
+        itemIcon.gameObject.SetActive(true);
+        itemIcon.sprite = data.icon;
+        itemData = data;
     }
 
     public void UseItem()
     {
-        InventoryManager.Instance.UseItem(itemData);
+        if (itemData.type == ItemType.Equipabble)
+        {
+            if (InventoryManager.Instance.GetEquipmentSlot(itemData.slotType) > 0)
+            {
+                InventoryManager.Instance.UseItem(itemData);
+                itemIcon.gameObject.SetActive(false);
+                itemData = null;
+                itemIcon.sprite = null;
+            }
+        }
+        else
+        {
+            InventoryManager.Instance.UseItem(itemData);
+            itemIcon.gameObject.SetActive(false);
+            itemData = null;
+            itemIcon.sprite = null;
+        }
+        // TODO
         // Reset the item data and the icons here
-        itemIcon.enabled = false;
-        itemIcon.sprite = null;
-        itemData = null;
     }
 
     public bool HasItem()

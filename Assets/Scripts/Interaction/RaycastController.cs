@@ -5,8 +5,13 @@ using TMPro;
 
 public class RaycastController : MonoBehaviour
 {
+    private Item itemScript;
+    //changes the canvas text based on what it's detecting
     [SerializeField]
     private float raycastDistance = 5.0f;
+
+    [SerializeField]
+    private float groundDistance = 2.1f;
 
     [SerializeField]
     //The layer that will determine what the raycast will hit
@@ -17,28 +22,34 @@ public class RaycastController : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        //TODO: Raycast
-        //1. Perform a raycast originating from the gameobject's position towards its forward direction.
-        //   Make sure that the raycast will only hit the layer specified in the layermask
-        if(Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, raycastDistance, layerMask))
+        // Cast a ray from the camera's position forward
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        // Check if the ray hits any object
+        if (Physics.Raycast(transform.position, transform.forward, out hit, raycastDistance))
         {
-            //2. Check if the object hits any Interactable. If it does, show the interactionInfo and set its text
-            //   to the id of the Interactable hit. If it doesn't hit any Interactable, simply disable the text
-            if(hit.collider.TryGetComponent<Interactable>(out Interactable interactable))
+            if (hit.collider.CompareTag("Usable") || hit.collider.CompareTag("Equippable"))
             {
-                interactionInfo.gameObject.SetActive(true);
-                interactionInfo.text = interactable.id;
-                //3. Make sure to interact with the Interactable only when the mouse button is pressed.
-                if (Input.GetMouseButtonDown(0)) 
+                interactionInfo.GetComponent<TextMeshProUGUI>().text = hit.collider.GetComponent<Item>().id;
+                
+                if (Input.GetKeyDown(KeyCode.Mouse0))
                 {
-                    interactable.Interact();
+                    hit.collider.gameObject.GetComponent<Item>().Interact();
                 }
             }
-       
+            else
+            {
+                interactionInfo.GetComponent<TextMeshProUGUI>().text = "";
+            }
         }
-        else
-        {
-            interactionInfo.gameObject.SetActive(false);
-        }
+    }
+
+    public bool isGrounded()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        return Physics.Raycast(transform.position, -transform.up, out hit, groundDistance);
     }
 }

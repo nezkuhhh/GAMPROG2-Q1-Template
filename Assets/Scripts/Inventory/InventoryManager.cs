@@ -5,6 +5,8 @@ using UnityEngine;
 public class InventoryManager : MonoBehaviour
 {
     public Player player;
+
+    [SerializeField]
     //For now, this will store information of the Items that can be added to the inventory
     public List<ItemData> itemDatabase;
 
@@ -16,7 +18,8 @@ public class InventoryManager : MonoBehaviour
 
     //Singleton implementation. Do not change anything within this region.
     #region SingletonImplementation
-    private static InventoryManager instance = null;
+    private static InventoryManager instance = null
+        ;
     public static InventoryManager Instance
     {
         get
@@ -53,70 +56,65 @@ public class InventoryManager : MonoBehaviour
 
     public void UseItem(ItemData data)
     {
-        // If the item is a consumable, simply add the attributes of the item to the player.
-        switch(data.type) 
+        if (data.type == ItemType.Consumable)
         {
-            case ItemType.Consumable:
-                player.AddAttributes(data.attributes);
-                break;
-            // If it is equippable, get the equipment slot that matches the item's slot.
-            case ItemType.Equipabble:
-                if (GetEquipmentSlotIndex(data.slotType) == -1) break;
-                // Set the equipment slot's item as that of the used item
-                equipmentSlots[GetEquipmentSlotIndex(data.slotType)].SetItem(data);
-                break;
+            player.AddAttributes(data.attributes);
+        }
+        else if (data.type == ItemType.Equipabble)
+        {
+            player.AddAttributes(data.attributes);
+            equipmentSlots[GetEquipmentSlot(data.slotType)].SetItem(data);
         }
     }
 
-    // This function returns a bool to inform whether the AddItem is successful or not
-    public bool AddItem(string itemID)
+   
+    public void AddItem(string itemID)
     {
-        //1. Cycle through every item in the database until you find the item with the same id.
-        for(int i = 0; i < itemDatabase.Count; i++)
+        for (int i = 0; i <= itemDatabase.Count; i++)
         {
-            if (itemDatabase[i].id == itemID)
+            if (GetEmptyInventorySlot() != -1)
             {
-                //2. Get the index of the InventorySlot that does not have any Item and set its Item to the Item found
-                // Check if there is an available slot before adding it
-                if (!GetEmptyInventorySlot()) return false;
-                GetEmptyInventorySlot().SetItem(itemDatabase[i]);
+                if (itemDatabase[i].id == itemID)
+                {
+                    inventorySlots[GetEmptyInventorySlot()].SetItem(itemDatabase[i]);
+                    break;
+                }
+            }
 
-                //if (GetEmptyInventorySlotIndex() == -1) return false;
-                //inventorySlots[GetEmptyInventorySlotIndex()].SetItem(itemDatabase[i]);
+        }
+    }
+
+    public int GetEmptyInventorySlot()
+    {
+        int temp = -1;
+        for (int i = 0; i <= inventorySlots.Count - 1; i++)
+        {
+            if (!inventorySlots[i].HasItem())
+            {
+                temp = i;
+                break;
             }
         }
-        return true;
+        return temp;
     }
 
-    public int GetEmptyInventorySlotIndex()
+    public int GetEquipmentSlot(EquipmentSlotType type)
     {
-        //Check which inventory slot doesn't have an Item and return its index
-        for(int i = 0; i < inventorySlots.Count; i++) 
-        {
-            if (!inventorySlots[i].HasItem())
-                return i;
-        }
-        return -1;
-    }
-
-    public InventorySlot GetEmptyInventorySlot()
-    {
-        for (int i = 0; i < inventorySlots.Count; i++)
-        {
-            if (!inventorySlots[i].HasItem())
-                return inventorySlots[i];
-        }
-        return null;
-    }
-
-    public int GetEquipmentSlotIndex(EquipmentSlotType type)
-    {
+        //TODO
         //Check which equipment slot matches the slot type and return its index
-        for (int i = 0; i < equipmentSlots.Count; i++)
+        int temp = -1;
+        for (int i = 0; i <= equipmentSlots.Count - 1; i++)
         {
             if (equipmentSlots[i].type == type)
-                return i;
+            {
+                if (!equipmentSlots[i].HasItem())
+                {
+                    temp = i;
+                    break;
+                }
+            }
         }
-        return -1;
+
+        return temp;
     }
 }

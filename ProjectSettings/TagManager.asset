@@ -4,16 +4,19 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - CinemachineTarget
+  - Floor
+  - Interactable
+  - Usable
+  - Equippable
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
   - Interactable
-  - Ground
+  - 
   - 
   - 
   - 

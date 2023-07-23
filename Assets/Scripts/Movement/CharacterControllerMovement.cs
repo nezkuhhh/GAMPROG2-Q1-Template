@@ -8,18 +8,27 @@ public class CharacterControllerMovement : MonoBehaviour
     private float moveSpeed = 2.0f;
     [SerializeField]
     private float gravityScale = 1.0f;
+
+    //establish the height of the jump
     [SerializeField]
-    private float jumpHeight = 3.0f;
+    public float jumpForce = 10f;
 
     private float gravity = -9.8f;
-    private float groundedVelocity = -0.5f;
-    private float yVelocity;
+
+    public bool isJumping = false;
+
+    private Rigidbody rb;
 
     private CharacterController characterController;
+
+    private RaycastController groundCheck;
 
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
+        rb = GetComponent<Rigidbody>();
+        groundCheck = GetComponentInChildren<RaycastController>();
+        
     }
 
     private void Update()
@@ -29,27 +38,34 @@ public class CharacterControllerMovement : MonoBehaviour
 
     private void Move()
     {
-        Vector3 moveDirection = (Input.GetAxis("Horizontal") * transform.right + Input.GetAxis("Vertical") * transform.forward) * Time.deltaTime;
-        moveDirection += GetGravityAndJump();
+       float xMove = Input.GetAxis("Horizontal");
+       float zMove = Input.GetAxis("Vertical");
+
+        Vector3 moveDirection = (transform.right * xMove) + (transform.forward * zMove);
+        moveDirection.y += gravity * Time.deltaTime * gravityScale;
+        moveDirection *= moveSpeed * Time.deltaTime;
+
+
+        //code for jumping
+        if ((Input.GetKeyDown(KeyCode.Space)) && groundCheck.isGrounded())
+        {
+            moveDirection.y += jumpForce * Time.deltaTime;
+            Debug.Log("Jumping");
+            isJumping = true;
+        }
+
         characterController.Move(moveDirection);
     }
 
-    private Vector3 GetGravityAndJump()
-    {
-        //Ensure that the character is kept grounded
-        if (characterController.isGrounded && yVelocity < 0f)
-        {
-            yVelocity = groundedVelocity;
-        }
-        if(characterController.isGrounded && Input.GetKeyDown(KeyCode.Space)) 
-        {
-            // Calculate the velocity given the height
-            yVelocity = Mathf.Sqrt(jumpHeight * 2.0f * Mathf.Abs(gravity));
-        }
-        // Keep applying gravitational force
-        yVelocity += gravity * gravityScale * Time.deltaTime;
-        return Vector3.up * yVelocity * Time.deltaTime;
-    }
 
-    
+    //checks if the player is colliding with the floor to prevent double jumps
+    private void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log(collision.gameObject.name + rb);
+        if (collision.gameObject.CompareTag("Floor"))
+        {
+            isJumping = false;
+            Debug.Log("Detecting ground");
+        }
+    }
 }

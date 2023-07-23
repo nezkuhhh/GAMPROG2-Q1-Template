@@ -5,11 +5,21 @@ using UnityEngine.UI;
 
 using TMPro;
 
-public class DisplayHealthBar : AttributeBar
+public class DisplayHealthBar : MonoBehaviour
 {
-    protected override void Start()
+    public TextMeshProUGUI text;
+    public Image fill;
+
+    private void UpdateBar()
     {
-        base.Start();
-        maxValue = player.maxHP;
+        Player player = InventoryManager.Instance.player;
+        float currentHealth = player.GetAttributeValue(AttributeType.HP);
+        fill.fillAmount = currentHealth / player.maxHP;
+        text.text = ($"HP {currentHealth} / {player.maxHP}");
+    }
+
+    private void Update()
+    {
+        UpdateBar();
     }
 }

@@ -1,14 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DisplayManaBar : AttributeBar
+using TMPro;
+
+public class DisplayManaBar : MonoBehaviour
 {
-    protected override void Start()
+    public TextMeshProUGUI text;
+    public Image fill;
+
+    private void UpdateBar()
     {
-        base.Start();
-        maxValue = player.maxMP;
+        Player player = InventoryManager.Instance.player;
+        float currentHealth = player.GetAttributeValue(AttributeType.MP);
+        fill.fillAmount = currentHealth / player.maxMP;
+        text.text = ($"HP {currentHealth} / {player.maxMP}");
+    }
+
+    private void Update()
+    {
+        UpdateBar();
     }
 }
